@@ -25,10 +25,11 @@ app.listen(port);
 
 console.log('Servidor HTTP esta escutando na porta ' + port);
 
+con.connect();
+
 app.get('/', function(req, res){
 	res.redirect("/api/v1/")
 });
-
 
 app.get('/api', (req, rep) => {
 	rep.redirect("/api/v1/")
@@ -44,9 +45,13 @@ app.get('/api/v1/', function(req, res){
 	})
 });
 
-app.get("/api/v1/alunos/", (req, res) => {
-	con.connect();
+/**
+ * dados de usuario
+ */
 
+// recupera todos os alunos
+app.get("/api/v1/alunos/", (req, res) => {
+	
 	con.query('SELECT * from alunos', function (error, results, fields) {
 		if(error){
 			res.send(JSON.stringify({"status": 500, "error": error, "response": "ops... tentei mas não deu"})); 
@@ -56,6 +61,59 @@ app.get("/api/v1/alunos/", (req, res) => {
 			//If there is no error, all is good and response is 200 OK.
 		}
 	});
+	  
+})
 
-	  con.end();
+// recupera alunos por id
+app.get("/api/v1/alunos/:id", (req, res) => {		
+
+	con.query(`SELECT * from alunos WHERE id_aluno=${req.params.id}`, function (error, results, fields) {
+		if(error){
+			res.send(JSON.stringify({"status": 500, "response": "ops... tentei mas não deu"})); 			
+		} else {			
+			res.send(JSON.stringify({"status": 200, "error": null, "response": results}));			
+		}
+				
+	});	
+})
+
+// recupera disciplinas seguidas pelo aluno por id
+
+app.get("/api/v1/alunos/segue/:id", (req, res) => {		
+
+	let query = `
+		SELECT a.nome, d.nome_disciplina, p.nome_professor, dp.bloco, dp.sala FROM alunos a
+		INNER JOIN segue s ON s.fk_aluno=a.id_aluno
+		INNER JOIN disc_professor dp ON dp.id_disc_professor=s.fk_disc_professor
+		INNER JOIN disciplina d ON d.id_disciplina=dp.fk_disciplina
+		INNER JOIN professores p ON p.id_professor=dp.fk_professor
+		WHERE A.id_aluno = ${req.params.id};
+	`;
+	
+	con.query(query, function (error, results, fields) {
+		if(error){
+			res.send(JSON.stringify({"status": 500, "response": "ops... tentei mas não deu"})); 			
+		} else {			
+			res.send(JSON.stringify({"status": 200, "error": null, "response": results}));			
+		}
+	});	
+})
+
+/**
+ * dados de disciplinas
+ */
+
+app.get("/api/v1/disciplinas/", (req, res) => {		
+
+	let query = `
+		SELECT * FROM disciplina;
+	`;
+	
+	con.query(query, function (error, results, fields) {
+		if(error){
+			res.send(JSON.stringify({"status": 500, "response": "ops... tentei mas não deu"})); 			
+		} else {			
+			res.send(JSON.stringify({"status": 200, "error": null, "response": results}));			
+		}
+	});	
 })
