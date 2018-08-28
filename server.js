@@ -148,6 +148,32 @@ app.get("/api/v1/alunos/segue/:id", (req, res) => {
 	});
 })
 
+app.post("/api/v1/alunos/seguir/", (req, res) => {
+	let dados = req.body	
+
+	let query = `
+		INSERT INTO segue(fk_disc_professor, fk_aluno)
+		VALUES (${dados.id}, ${dados.id_disc});
+	`
+
+	console.log(query)
+
+	con.query( query , function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+	});
+})
+
 /**
  * dados de disciplinas
  */
@@ -324,6 +350,33 @@ app.get("/api/v1/disciplinas/professor/:id", (req, res) => {
 	});
 })
 
+
+app.post("/api/v1/disciplinas/incluir/", (req, res) => {
+	let dados = req.body	
+
+	let query = `
+		INSERT INTO disciplina(id_disciplina, nome_disciplina, descricao)
+		VALUES (DEFAULT,'${dados.nome_disciplina}', '${dados.descricao}');
+	`
+
+	console.log(query)
+
+	con.query( query , function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+	});
+})
+
 /**
  * dados de professores
  */
@@ -423,6 +476,36 @@ app.put("/api/v1/professor/status/teste/:id/:status", (req, res) => {
 		UPDATE professores
 		SET status = '${req.params.status}'
 		WHERE id_professor=${req.params.id}`, function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+	});
+})
+
+
+app.post("/api/v1/professor/incluir/", (req, res) => {
+	let dados = req.body
+
+	// nescessario logica para gerar token
+	let token = "abcdef"
+
+	let query = `
+		INSERT INTO alunos(id_aluno, nome, email, senha, token)
+		VALUES (DEFAULT, '${dados.nome}','${dados.email}', '${dados.senha}', '${token}');
+	`
+
+	console.log(query)
+
+	con.query( query , function (error, results, fields) {
 		if (error) {
 			res.send(JSON.stringify({
 				"status": 500,
