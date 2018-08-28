@@ -32,6 +32,9 @@ try {
 	console.log("BANCO DE DADOS OFFLINE")
 }
 
+/**
+ * dados da API
+ */
 
 app.get('/', function (req, res) {
 	res.redirect("/api/v1/")
@@ -41,7 +44,6 @@ app.get('/api', (req, rep) => {
 	rep.redirect("/api/v1/")
 })
 
-//GET (ready)
 app.get('/api/v1/', function (req, res) {
 
 	res.json({
@@ -98,8 +100,27 @@ app.get("/api/v1/alunos/:id", (req, res) => {
 	});
 })
 
-// recupera disciplinas seguidas pelo aluno por id
+// recupera aluno por email
+app.get("/api/v1/alunos/email/:email", (req, res) => {
 
+	con.query(`SELECT id_aluno, nome from alunos WHERE email=${req.params.email}`, function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+
+	});
+})
+
+// recupera disciplinas seguidas pelo aluno por id
 app.get("/api/v1/alunos/segue/:id", (req, res) => {
 
 	let query = `
@@ -126,7 +147,6 @@ app.get("/api/v1/alunos/segue/:id", (req, res) => {
 		}
 	});
 })
-
 
 /**
  * dados de disciplinas
@@ -177,9 +197,52 @@ app.get("/api/v1/disciplinas/:id", (req, res) => {
 	});
 })
 
+// recupera disciplinas por nome
+app.get("/api/v1/disciplinas/nome/:nome", (req, res) => {
 
+	con.query(`SELECT * from disciplina WHERE nome_disciplina like "${'%'+ req.params.nome + '%'}"`, function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
 
-// disciplina x professor
+	});
+})
+
+app.get("/api/v1/disciplinas/professor/:id", (req, res) => {
+
+	let query = `
+		SELECT d.id_disciplina, d.nome_disciplina, dp.bloco, dp.sala 
+		FROM disc_professor dp
+		INNER JOIN professores p ON p.id_professor=dp.fk_professor
+		INNER JOIN disciplina d ON d.id_disciplina=dp.fk_disciplina
+		WHERE p.id_professor=${req.params.id};	
+	`;
+
+	con.query(query, function (error, results, fields) {
+		if (error || results.length == 0) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			console.log(results.length)
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+	});
+})
 
 app.get("/api/v1/disciplinas/professor/:id", (req, res) => {
 
@@ -223,7 +286,7 @@ app.get("/api/v1/disciplinas/professor/:id", (req, res) => {
 						"status": results[0].status,
 						"grade": []
 					}
-					
+
 					for (let i = 0; i < results2.length; i++) {
 
 						if (i == 0) {
@@ -257,6 +320,120 @@ app.get("/api/v1/disciplinas/professor/:id", (req, res) => {
 					}));
 				}
 			});
+		}
+	});
+})
+
+/**
+ * dados de professores
+ */
+
+// recupera todos os professores
+app.get("/api/v1/professor/", (req, res) => {
+
+	let query = `
+		SELECT id_professor, nome_professor, email FROM professores;
+	`;
+
+	con.query(query, function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+	});
+})
+
+// disciplinas que o professor da aula
+app.get("/api/v1/professor/:id", (req, res) => {
+
+	let query = `
+		SELECT id_professor, nome_professor, email 
+		FROM professores
+		WHERE id_professor=${req.params.id};
+	`;
+
+	con.query(query, function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+	});
+})
+
+app.get("/api/v1/professor/nome/:nome", (req, res) => {
+
+	con.query(`SELECT id_professor, nome_professor, email FROM professores WHERE nome_professor like "${'%'+ req.params.nome + '%'}"`, function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+
+	});
+})
+
+app.get("/api/v1/professor/status/:id", (req, res) => {
+
+	con.query(`
+		SELECT p.id_professor, p.nome_professor, p.email, p.status
+		FROM professores p WHERE id_professor=${req.params.id}`, function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+	});
+})
+
+
+// atualiza status do professor
+app.put("/api/v1/professor/status/teste/:id/:status", (req, res) => {
+
+	con.query(`
+		UPDATE professores
+		SET status = '${req.params.status}'
+		WHERE id_professor=${req.params.id}`, function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
 		}
 	});
 })
