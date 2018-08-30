@@ -1,6 +1,10 @@
-module.exports.getTodosProfessores = function(application, req, res){
+/**
+ * Gets methods
+ */
 
-    var connection = application.config.dbconnection();
+module.exports.getTodosProfessores = function (application, req, res) {
+
+	var connection = application.config.dbconnection();
 
 	let query = `
 		SELECT id_professor, nome_professor, email FROM professores;
@@ -21,13 +25,13 @@ module.exports.getTodosProfessores = function(application, req, res){
 		}
 	});
 
-    connection.end();
-    
+	connection.end();
+
 }
 
-module.exports.getProfessoresId = function(application, req, res){
+module.exports.getProfessoresId = function (application, req, res) {
 
-    var connection = application.config.dbconnection();
+	var connection = application.config.dbconnection();
 
 	let query = `
 		SELECT id_professor, nome_professor, email 
@@ -35,7 +39,7 @@ module.exports.getProfessoresId = function(application, req, res){
 		WHERE id_professor=${req.params.id};
 	`;
 
-    console.log(query)
+	console.log(query)
 
 	connection.query(query, function (error, results, fields) {
 		if (error) {
@@ -52,13 +56,13 @@ module.exports.getProfessoresId = function(application, req, res){
 		}
 	});
 
-    connection.end();
-    
+	connection.end();
+
 }
 
-module.exports.getProfessoresNome = function(application, req, res){
+module.exports.getProfessoresNome = function (application, req, res) {
 
-    var connection = application.config.dbconnection();
+	var connection = application.config.dbconnection();
 
 	connection.query(`SELECT id_professor, nome_professor, email FROM professores WHERE nome_professor like "${'%'+ req.params.nome + '%'}"`, function (error, results, fields) {
 		if (error) {
@@ -76,13 +80,13 @@ module.exports.getProfessoresNome = function(application, req, res){
 
 	});
 
-    connection.end();
-    
+	connection.end();
+
 }
 
-module.exports.getStatusProfessor = function(application, req, res){
+module.exports.getStatusProfessor = function (application, req, res) {
 
-    var connection = application.config.dbconnection();
+	var connection = application.config.dbconnection();
 
 	connection.query(`
 		SELECT p.id_professor, p.nome_professor, p.email, p.status
@@ -98,19 +102,31 @@ module.exports.getStatusProfessor = function(application, req, res){
 				"error": null,
 				"response": results
 			}));
-        }
-        connection.end();
-	});        
+		}
+		connection.end();
+	});
 }
 
-module.exports.insertProfessor = function(application, req, res){
+/**
+ * Post methods
+ */
 
-    res.send('a fazer')
+module.exports.insertProfessor = function (application, req, res) {
+
+	res.send('a fazer')
 }
 
-module.exports.updateStatusProfessor = function(application, req, res){
+/**
+ * Puts methods
+ */
 
-    var connection = application.config.dbconnection();
+module.exports.updateStatusProfessor = function (application, req, res) {
+	res.send('a fazer')
+}
+
+module.exports.updateStatusProfessor = function (application, req, res) {
+
+	var connection = application.config.dbconnection();
 
 	connection.query(`
 		UPDATE professores
@@ -127,7 +143,15 @@ module.exports.updateStatusProfessor = function(application, req, res){
 				"error": null,
 				"response": results
 			}));
-        }
-        connection.end()
-	});      
+		}
+		connection.end()
+	});
+}
+
+/**
+ * Delete methods
+ */
+
+module.exports.updateProfessor = function (application, req, res) {
+	res.send('a fazer')
 }

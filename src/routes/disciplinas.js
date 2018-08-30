@@ -31,12 +31,20 @@ module.exports = function(application){
 	 * Puts
 	 */
 
-	 application.put('/api/v1/disciplinas/update/', (req, res) => {
+	 application.put('/api/v1/disciplinas/', (req, res) => {
 		application.src.controllers.disciplinasCtrl.updateDisciplina(application, req, res)
 	 })
 
-	 application.put('/api/v1/disciplinas/horario/update/', (req, res) => {
+	 application.put('/api/v1/disciplinas/horario/', (req, res) => {
 		application.src.controllers.disciplinasCtrl.updateDisciplinaHorario(application, req, res)
+	 })
+
+	/**
+	 * Delete
+	 */
+
+	 application.delete('/api/v1/disciplinas', (req, res) => {
+		 application.src.controllers.disciplinasCtrl.deleteDisciplina(application, req, res)
 	 })
 
 }

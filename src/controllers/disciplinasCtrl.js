@@ -266,3 +266,35 @@ module.exports.insertHorarioDisciplina = function(application, req, res){
 	});	
 
  }
+
+ /**
+ * Delete methods
+ */
+
+ module.exports.deleteDisciplina = (application, req, res) => {	 	
+	
+	let dados = req.body
+	let connection = application.config.dbconnection()
+
+	let query = `
+		DELETE FROM disciplina
+		WHERE id_disciplina = ${dados.id}
+	`
+
+	connection.query(query, (error, results, fields) => {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+		connection.end();
+	})
+
+ }
