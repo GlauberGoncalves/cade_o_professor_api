@@ -176,7 +176,7 @@ module.exports.insertDisciplina = function(application, req, res){
 
 	let query = `
 		INSERT INTO disciplina(id_disciplina, nome_disciplina, descricao)
-		VALUES (DEFAULT,'${dados.nome_disciplina}', '${dados.descricao}');
+		VALUES (DEFAULT,'${dados.disciplina}', '${dados.descricao}');
 	`
 
 	console.log(query)
@@ -199,3 +199,70 @@ module.exports.insertDisciplina = function(application, req, res){
 	});
 
 }
+
+module.exports.insertHorarioDisciplina = function(application, req, res){
+
+	var connection = application.config.dbconnection();
+
+	let dados = req.body	
+
+	let query = `
+		INSERT INTO horarios(fk_disc_professor, dia_semana, hora)
+		VALUES (${dados.id}, '${dados.dia_semana}', '${dados.hora}');
+	`	
+
+	connection.query( query , function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+
+		connection.end();
+	});
+
+}
+
+/**
+ * Put methods
+ */
+
+ module.exports.updateDisciplina = (application, req, res) => {
+	
+	
+	let dados = req.body
+	let connection = application.config.dbconnection()
+	
+	let query = `
+		UPDATE disciplina
+		SET nome_disciplina = '${dados.disciplina}', descricao = '${dados.descricao}'
+		WHERE id_disciplina = ${dados.id}
+	`;
+
+
+	console.log(query)
+
+	connection.query(query, (error, results, fields) => {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+		connection.end();
+	});	
+
+ }

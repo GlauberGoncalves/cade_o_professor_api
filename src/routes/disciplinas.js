@@ -23,4 +23,20 @@ module.exports = function(application){
 		application.src.controllers.disciplinasCtrl.insertDisciplina(application, req, res)
 	});
 
+	application.post("/api/v1/disciplinas/horario/incluir/", (req, res) => {		
+		application.src.controllers.disciplinasCtrl.insertHorarioDisciplina(application, req, res)
+	})
+
+	/**
+	 * Puts
+	 */
+
+	 application.put('/api/v1/disciplinas/update/', (req, res) => {
+		application.src.controllers.disciplinasCtrl.updateDisciplina(application, req, res)
+	 })
+
+	 application.put('/api/v1/disciplinas/horario/update/', (req, res) => {
+		application.src.controllers.disciplinasCtrl.updateDisciplinaHorario(application, req, res)
+	 })
+
 }
