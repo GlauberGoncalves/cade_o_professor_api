@@ -1,3 +1,34 @@
+module.exports.login = (application, req, res) => {
+	var connection = application.config.dbconnection();
+
+	let dados = req.body
+
+	let query = `
+		SELECT COUNT(*) FROM alunos
+		WHERE email='${dados.email}' and senha='${dados.senha}'
+	`
+
+	connection.query(query, (error, results, fields) => {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"error": error,
+				"response": "ops... tentei mas não deu"
+			}));
+
+			//If there is error, we send the error in the error section with 500 status
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": "usuario valido"
+			}));
+			//If there is no error, all is good and response is 200 OK.
+		}
+		connection.end();	
+	})	
+}
+
 module.exports.getTodosAlunos = function (application, req, res) {
 
 	var connection = application.config.dbconnection();
@@ -117,6 +148,36 @@ module.exports.insertSeguirDisciplina = function (application, req, res) {
 		VALUES (${dados.id}, ${dados.id_disc});
 	`
 
+	console.log(query)
+
+	connection.query(query, function (error, results, fields) {
+		if (error) {
+			res.send(JSON.stringify({
+				"status": 500,
+				"response": "ops... tentei mas não deu"
+			}));
+		} else {
+			res.send(JSON.stringify({
+				"status": 200,
+				"error": null,
+				"response": results
+			}));
+		}
+
+		connection.end()
+	});
+}
+
+module.exports.insertAluno = function (application, req, res) {
+
+	var connection = application.config.dbconnection();
+
+	let dados = req.body
+
+	let query = `
+		INSERT INTO alunos(id_aluno, nome, email, senha)
+		VALUES (DEFAULT, '${dados.nome}', '${dados.email}', '${dados.senha}');
+	`	
 	console.log(query)
 
 	connection.query(query, function (error, results, fields) {
