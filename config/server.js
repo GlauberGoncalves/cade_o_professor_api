@@ -20,6 +20,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 consign()
 	.include('src/routes')	
 	.then('src/controllers')
+	.then('src/models')
 	.then('config/dbconnection.js')
 	.into(app);
 

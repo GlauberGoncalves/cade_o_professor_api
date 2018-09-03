@@ -1,11 +1,5 @@
 module.exports = function(application){
 
-
-	application.post('/api/v1/alunos/login/', function(req, res){		
-		application.src.controllers.alunosCtrl.login(application, req, res)
-	});
-
-
 	/****************************
 	 * 
 	 *   Gets
@@ -40,6 +34,10 @@ module.exports = function(application){
 
 	application.post('/api/v1/alunos/', function(req, res){		
 		application.src.controllers.alunosCtrl.insertAluno(application, req, res)
+	});
+
+	application.post('/api/v1/alunos/login/', function(req, res){		
+		application.src.controllers.alunosCtrl.login(application, req, res)
 	});
 
 }

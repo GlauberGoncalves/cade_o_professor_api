@@ -3,7 +3,7 @@ module.exports.getTodasDisciplinas = function(application, req, res){
     var connection = application.config.dbconnection();
 
 	let query = `
-		SELECT * FROM disciplina;
+		SELECT * FROM disciplinas;
 	`;
 
 	connection.query(query, function (error, results, fields) {
@@ -30,7 +30,7 @@ module.exports.getDisciplinaPorId = function(application, req, res){
     var connection = application.config.dbconnection();
 
 	let query = `
-		SELECT * FROM disciplina WHERE id_disciplina=${req.params.id};
+		SELECT * FROM disciplinas WHERE id_disciplina=${req.params.id};
 	`;
 
 	connection.query(query, function (error, results, fields) {
@@ -56,7 +56,7 @@ module.exports.getDisciplinaPorNome = function(application, req, res){
 
     var connection = application.config.dbconnection();
 
-	connection.query(`SELECT * from disciplina WHERE nome_disciplina like "${'%'+ req.params.nome + '%'}"`, function (error, results, fields) {
+	connection.query(`SELECT * from disciplinas WHERE nome_disciplina like "${'%'+ req.params.nome + '%'}"`, function (error, results, fields) {
 		if (error) {
 			res.send(JSON.stringify({
 				"status": 500,
@@ -80,16 +80,16 @@ module.exports.getDisciplinasDoProfessorPorId = function(application, req, res){
     var connection = application.config.dbconnection();
 	
 	let query = `
-		SELECT d.nome_disciplina, d.descricao, dp.bloco, dp.sala, p.nome_professor, p.status FROM disc_professor dp
-		INNER JOIN professores p ON p.id_professor=dp.fk_professor
-		INNER JOIN disciplina d ON d.id_disciplina=dp.fk_disciplina
+		SELECT d.nome_disciplina, d.descricao, t.bloco, t.sala, p.nome_professor, p.status FROM turmas t
+		INNER JOIN professores p ON p.id_professor=t.fk_professor
+		INNER JOIN disciplinas d ON d.id_disciplina=t.fk_disciplina
 		WHERE d.id_disciplina=${req.params.id};
 	`;
 
 	let queryHorarios = `
-		SELECT h.dia_semana, h.hora FROM disc_professor dp
-		INNER JOIN horarios h ON h.fk_disc_professor=dp.id_disc_professor
-		WHERE dp.id_disc_professor=${req.params.id}
+		SELECT h.dia_semana, h.hora FROM turmas t
+		INNER JOIN horarios h ON h.fk_turma=t.id_turma
+		WHERE t.id_turma=${req.params.id}
 		ORDER BY h.dia_semana asc
 	`
 
@@ -175,7 +175,7 @@ module.exports.insertDisciplina = function(application, req, res){
 	let dados = req.body	
 
 	let query = `
-		INSERT INTO disciplina(id_disciplina, nome_disciplina, descricao)
+		INSERT INTO disciplinas(id_disciplina, nome_disciplina, descricao)
 		VALUES (DEFAULT,'${dados.disciplina}', '${dados.descricao}');
 	`
 
@@ -204,10 +204,10 @@ module.exports.insertHorarioDisciplina = function(application, req, res){
 
 	var connection = application.config.dbconnection();
 
-	let dados = req.body	
+	let dados = req.body
 
 	let query = `
-		INSERT INTO horarios(fk_disc_professor, dia_semana, hora)
+		INSERT INTO horarios(fk_turma, dia_semana, hora)
 		VALUES (${dados.id}, '${dados.dia_semana}', '${dados.hora}');
 	`	
 
@@ -241,13 +241,10 @@ module.exports.insertHorarioDisciplina = function(application, req, res){
 	let connection = application.config.dbconnection()
 	
 	let query = `
-		UPDATE disciplina
+		UPDATE disciplinas
 		SET nome_disciplina = '${dados.disciplina}', descricao = '${dados.descricao}'
 		WHERE id_disciplina = ${dados.id}
-	`;
-
-
-	console.log(query)
+	`;	
 
 	connection.query(query, (error, results, fields) => {
 		if (error) {
@@ -264,7 +261,6 @@ module.exports.insertHorarioDisciplina = function(application, req, res){
 		}
 		connection.end();
 	});	
-
  }
 
  /**
@@ -277,7 +273,7 @@ module.exports.insertHorarioDisciplina = function(application, req, res){
 	let connection = application.config.dbconnection()
 
 	let query = `
-		DELETE FROM disciplina
+		DELETE FROM disciplinas
 		WHERE id_disciplina = ${dados.id}
 	`
 
@@ -296,5 +292,4 @@ module.exports.insertHorarioDisciplina = function(application, req, res){
 		}
 		connection.end();
 	})
-
  }
