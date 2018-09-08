@@ -25,8 +25,8 @@ module.exports.login = (application, req, res) => {
 			}));
 			//If there is no error, all is good and response is 200 OK.
 		}
-		connection.end();	
-	})	
+		connection.end();
+	})
 }
 
 module.exports.getTodosAlunos = function (application, req, res) {
@@ -67,11 +67,20 @@ module.exports.getAlunoPorId = function (application, req, res) {
 				"response": "ops... tentei mas não deu"
 			}));
 		} else {
-			res.send(JSON.stringify({
-				"status": 200,
-				"error": null,
-				"response": results
-			}));
+
+			if (results.length == 0) {
+				res.send(JSON.stringify({
+					"status": 404,
+					"response": "Aluno não encontrado"
+				}));
+			} else {
+
+				res.send(JSON.stringify({
+					"status": 200,
+					"error": null,
+					"response": results
+				}));
+			}
 		}
 
 	});
@@ -179,7 +188,7 @@ module.exports.insertAluno = function (application, req, res) {
 	let query = `
 		INSERT INTO alunos(id_aluno, nome, email, senha)
 		VALUES (DEFAULT, '${dados.nome}', '${dados.email}', '${dados.senha}');
-	`	
+	`
 	console.log(query)
 
 	connection.query(query, function (error, results, fields) {

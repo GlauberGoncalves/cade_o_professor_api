@@ -1,8 +1,8 @@
 module.exports.getTurmaPorId = function (application, req, res) {
 
-    let id = req.params.id
-    let connection = application.config.dbconnection();    
-    let turmasDao = new application.src.models.turmasDao(connection)
+	let id = req.params.id
+	let connection = application.config.dbconnection();
+	let turmasDao = new application.src.models.turmasDao(connection)
 
 
 	turmasDao.getTurmas(id, function (error, results, fields) {
@@ -32,43 +32,42 @@ module.exports.getHorariosTurma = function (application, req, res) {
 
 	let id = req.params.id_turma
 
-    let connection = application.config.dbconnection();    
-	let turmasDao = new application.src.models.turmasDao(connection)
-	
+	let connection = application.config.dbconnection();
+
 	let resultFinal = {
 		"turma": {},
 		"grade": []
-	}	
+	}
 
 	let query = `
-		SELECT d.nome_disciplina, d.descricao, t.bloco, t.sala, p.nome_professor, p.status FROM turmas t
+		SELECT t.id_turma, d.nome_disciplina, d.descricao, t.bloco, t.sala, p.nome_professor, p.status FROM turmas t
 		INNER JOIN professores p ON p.id_professor=t.fk_professor
 		INNER JOIN disciplinas d ON d.id_disciplina=t.fk_disciplina
-		WHERE t.id_turma=${1};
-	`;	
+		WHERE t.id_turma=${id};
+	`;
 
-	connection.query(query , (error, results1, fields) => {
+	connection.query(query, (error, results1, fields) => {
 		if (error) {
 			res.send(JSON.stringify({
 				"status": 500,
 				"error": error,
 				"response": "ops... tentei mas não deu"
-			}))			
+			}))
 		} else {
 			resultFinal.turma = results1
 		}
 	})
 
-	turmasDao.getHorariosTurma(1, function (error, results, fields) {
+	turmasDao.getHorariosTurma(id, function (error, results, fields) {
 		if (error) {
 			res.send(JSON.stringify({
 				"status": 500,
 				"error": error,
 				"response": "ops... tentei mas não deu"
 			}));
-			
+
 		} else {
-				
+
 			for (let i = 0; i < results.length; i++) {
 
 				if (i == 0) {
@@ -81,7 +80,7 @@ module.exports.getHorariosTurma = function (application, req, res) {
 
 					let tamanho = resultFinal.grade.length
 					if (resultFinal.grade[tamanho - 1].dia_semana == results[i].dia_semana) {
-						resultFinal.grade[tamanho - 1].horarios.push(results[i].hora)												
+						resultFinal.grade[tamanho - 1].horarios.push(results[i].hora)
 
 					} else {
 						resultFinal.grade.push({
@@ -93,6 +92,10 @@ module.exports.getHorariosTurma = function (application, req, res) {
 				results[0]
 			}
 
+			resultFinal.turma.grade = []
+			resultFinal.turma.grade.push(resultFinal.grade);
+			console.log(resultFinal)
+
 			res.send(JSON.stringify({
 				"status": 200,
 				"error": null,
@@ -101,5 +104,5 @@ module.exports.getHorariosTurma = function (application, req, res) {
 
 			connection.end();
 		}
-	})	
+	})
 }

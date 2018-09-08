@@ -4,7 +4,7 @@ function TurmasDAO(connection){
 
 TurmasDAO.prototype.getTurmas = function(id, callback){
     this._connection.query(`
-    SELECT t.id_turma, p.nome_professor, p.status, t.bloco, t.sala
+    SELECT t.id_turma, d.nome_disciplina, p.nome_professor, p.status, t.bloco, t.sala
     FROM turmas t
     JOIN disciplinas d ON d.id_disciplina=t.fk_disciplina
     JOIN professores p ON p.id_professor=t.fk_professor

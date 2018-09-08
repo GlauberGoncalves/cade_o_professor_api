@@ -92,7 +92,6 @@ module.exports.getDisciplinasDoProfessorPorId = function(application, req, res){
 		WHERE t.id_turma=${req.params.id}
 		ORDER BY h.dia_semana asc
 	`
-
 	
 	connection.query(query, function (error, results, fields) {
 		if (error) {
@@ -101,8 +100,7 @@ module.exports.getDisciplinasDoProfessorPorId = function(application, req, res){
 				"response": "ops... tentei mas não deu"
 			}));
 		} else {
-
-			
+					
 			connection.query(queryHorarios, function (error, results2, fields) {
 				if (error) {
 					res.send(JSON.stringify({

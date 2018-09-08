@@ -5,7 +5,7 @@ module.exports = function(application){
 	 *   Gets
 	 * 
 	 ***************************/
-
+	
 	application.get('/api/v1/alunos/', function(req, res){		
 		application.src.controllers.alunosCtrl.getTodosAlunos(application, req, res)
 	});
