@@ -1,35 +1,36 @@
+let p = console.log
+
+// ok
 module.exports.login = (application, req, res) => {
 	var connection = application.config.dbconnection();
 
 	let dados = req.body
 
 	let query = `
-		SELECT COUNT(*) FROM alunos
+		SELECT token FROM alunos
 		WHERE email='${dados.email}' and senha='${dados.senha}'
 	`
 
 	connection.query(query, (error, results, fields) => {
 		if (error) {
 			res.send(JSON.stringify({
-				"status": 500,
-				"error": error,
-				"response": "ops... tentei mas não deu"
+				"status": 500,				
+				"response": "Erro Inesperado"
 			}));
-
-			//If there is error, we send the error in the error section with 500 status
+			
 		} else {
 			res.send(JSON.stringify({
-				"status": 200,
-				"error": null,
-				"response": "usuario valido"
+				"status": 200,				
+				"response": results
 			}));
-			//If there is no error, all is good and response is 200 OK.
+			
 		}
 		connection.end();
 	})
 }
 
-module.exports.getTodosAlunos = function (application, req, res) {
+// ok
+module.exports.alunosGet = function (application, req, res) {
 
 	var connection = application.config.dbconnection();
 
@@ -37,15 +38,13 @@ module.exports.getTodosAlunos = function (application, req, res) {
 		if (error) {
 			res.send(JSON.stringify({
 				"status": 500,
-				"error": error,
-				"response": "ops... tentei mas não deu"
+				"response": "Erro Inesperado"
 			}));
 
 			//If there is error, we send the error in the error section with 500 status
 		} else {
 			res.send(JSON.stringify({
-				"status": 200,
-				"error": null,
+				"status": 200,				
 				"response": results
 			}));
 			//If there is no error, all is good and response is 200 OK.
@@ -56,7 +55,8 @@ module.exports.getTodosAlunos = function (application, req, res) {
 
 }
 
-module.exports.getAlunoPorId = function (application, req, res) {
+// ok
+module.exports.alunosIdGet = function (application, req, res) {
 
 	var connection = application.config.dbconnection();
 
@@ -67,7 +67,7 @@ module.exports.getAlunoPorId = function (application, req, res) {
 				"response": "ops... tentei mas não deu"
 			}));
 		} else {
-
+			
 			if (results.length == 0) {
 				res.send(JSON.stringify({
 					"status": 404,
@@ -76,8 +76,7 @@ module.exports.getAlunoPorId = function (application, req, res) {
 			} else {
 
 				res.send(JSON.stringify({
-					"status": 200,
-					"error": null,
+					"status": 200,					
 					"response": results
 				}));
 			}
@@ -88,31 +87,38 @@ module.exports.getAlunoPorId = function (application, req, res) {
 	connection.end();
 }
 
-module.exports.getAlunoPorEmail = function (application, req, res) {
+// ok
+module.exports.alunoEmailGet = function (application, req, res) {
 
 	var connection = application.config.dbconnection();
 
-	connection.query(`SELECT id_aluno, nome from alunos WHERE email=${req.params.email}`, function (error, results, fields) {
+	connection.query(`SELECT id_aluno, nome, email from alunos WHERE email=${req.params.email}`, function (error, results, fields) {
 		if (error) {
 			res.send(JSON.stringify({
 				"status": 500,
 				"response": "ops... tentei mas não deu"
 			}));
 		} else {
-			res.send(JSON.stringify({
-				"status": 200,
-				"error": null,
-				"response": results
-			}));
+			if(results.length){
+				res.send(JSON.stringify({
+					"status": 200,					
+					"response": results
+				}));
+			} else {
+				res.send(JSON.stringify({
+					"status": 404,					
+					"response": "Aluno não encontrado"
+				}));				
+			}
 		}
-
 	});
 
 	connection.end();
 
 }
 
-module.exports.getDisciplinasSeguidas = function (application, req, res) {
+// ok
+module.exports.alunosTurmasSeguidasIdGet = function (application, req, res) {
 
 	var connection = application.config.dbconnection();
 
@@ -134,11 +140,19 @@ module.exports.getDisciplinasSeguidas = function (application, req, res) {
 				"response": "ops... tentei mas não deu"
 			}));
 		} else {
-			res.send(JSON.stringify({
-				"status": 200,
-				"error": null,
-				"response": results
-			}));
+
+			if(results.length){
+				res.send(JSON.stringify({
+					"status": 200,				
+					"response": results
+				}));
+			} else {
+				res.send(JSON.stringify({
+					"status": 404,				
+					"response": "Aluno não encontrado"
+				}));				
+			}
+
 		}
 	});
 	connection.end();
@@ -148,20 +162,17 @@ module.exports.getDisciplinasSeguidas = function (application, req, res) {
  * Posts
  */
 
-module.exports.insertSeguirDisciplina = function (application, req, res) {
+module.exports.alunoSeguirTurmaPost = function (application, req, res) {
 
 	var connection = application.config.dbconnection();
-
 	let dados = req.body
 
 	let query = `
-		INSERT INTO segue(fk_turmas, fk_aluno)
-		VALUES (${dados.id}, ${dados.id_disc});
-	`
-
-	console.log(query)
-
-	connection.query(query, function (error, results, fields) {
+		INSERT INTO segue(fk_turma, fk_aluno)
+		VALUES (${dados.idTurma}, ${dados.idAluno});
+	`		
+	
+	connection.query(query, function (error, results, fields) {		
 		if (error) {
 			res.send(JSON.stringify({
 				"status": 500,
@@ -169,9 +180,8 @@ module.exports.insertSeguirDisciplina = function (application, req, res) {
 			}));
 		} else {
 			res.send(JSON.stringify({
-				"status": 200,
-				"error": null,
-				"response": results
+				"status": 200,				
+				"response": "Aluno seguiu a turma com sucesso"
 			}));
 		}
 
@@ -179,7 +189,8 @@ module.exports.insertSeguirDisciplina = function (application, req, res) {
 	});
 }
 
-module.exports.insertAluno = function (application, req, res) {
+// ok
+module.exports.alunosPost = function (application, req, res) {
 
 	var connection = application.config.dbconnection();
 
@@ -192,16 +203,21 @@ module.exports.insertAluno = function (application, req, res) {
 	console.log(query)
 
 	connection.query(query, function (error, results, fields) {
+		console.log(error)
+		console.log(results)
 		if (error) {
 			res.send(JSON.stringify({
 				"status": 500,
-				"response": "ops... tentei mas não deu"
+				"response": "Erro Inesperado"				
 			}));
 		} else {
 			res.send(JSON.stringify({
-				"status": 200,
-				"error": null,
-				"response": results
+				"status": 201,				
+				"response": {
+					"id": results.insertId,
+					"nome": dados.nome,
+					"email": dados.email
+				}
 			}));
 		}
 
@@ -213,14 +229,15 @@ module.exports.insertAluno = function (application, req, res) {
  * Puts
  */
 
-module.exports.updateAluno = (application, req, res) => {
+ // ok
+module.exports.alunosPut = (application, req, res) => {
 
 	let dados = req.body
 	let connection = application.config.dbconnection()
 
 	let query = `
 		UPDATE alunos
-		SET nome = '${dados.nome}',  email = '${dados.email}', senha = '${dados.senha}'
+		SET nome = '${dados.nome}',  email = '${dados.email}'
 		WHERE id_aluno = ${dados.id}
 	`
 
@@ -231,11 +248,18 @@ module.exports.updateAluno = (application, req, res) => {
 				"response": "ops... tentei mas não deu"
 			}))
 		} else {
-			res.send(JSON.stringify({
-				"status": 200,
-				"error": null,
-				"response": results
-			}));
+			if(results.affectedRows){
+				res.send(JSON.stringify({
+					"status": 200,				
+					"response": "Aluno atualizado com sucesso"
+				}));
+			} else {
+				res.send(JSON.stringify({
+					"status": 404,
+					"response": "Aluno não encontrado"
+				}))
+			}
+			
 		}
 		connection.end();
 	})
@@ -245,7 +269,8 @@ module.exports.updateAluno = (application, req, res) => {
  * Delete
  */
 
-module.exports.deleteAluno = (application, req, res) => {
+// ok
+module.exports.alunosIdDelete = (application, req, res) => {
 
 	let dados = req.body
 	let connection = application.config.dbconnection()
@@ -262,11 +287,20 @@ module.exports.deleteAluno = (application, req, res) => {
 				"response": "ops... tentei mas não deu"
 			}));
 		} else {
+
+			if(results.affectedRows){
+				res.send(JSON.stringify({
+					"status": 200,					
+					"response": "Aluno excluído com sucesso!"
+				}));
+			} else {
+
 			res.send(JSON.stringify({
-				"status": 200,
-				"error": null,
-				"response": results
+				"status": 404,					
+				"response": "Aluno não encontrado"
 			}));
+		}
+
 		}
 		connection.end();
 	})
